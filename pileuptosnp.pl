@@ -55,11 +55,12 @@ sub parse_reads{
                 $read =~ /[A-Za-z]{$n}/g;
                 $match .= $&;
                 $nt{$match}++;
-            }else{$nt{$match}++;}
+            }else{
+                $nt{$match}++;
+            }
         }
     }
-    if(%nt){%nt;}
-    else{("*","");}
+    return %nt ? %nt : ("*" => "");
 }
 
 sub judge{
@@ -69,12 +70,36 @@ sub judge{
     if(exists $count{$nt}){
         $nt_count = $count{$nt};
     }
-    if($nt_count >= $cut_off){1;}
-    else{0;}
+    return $nt_count >= $cut_off ? 1 : 0;
+}
+
+sub decide_genotype{
+    my ($type, $bases, $main, $mutant, $para) = @_;
+    my $threshold = $para->{threshold};
+    die unless $type eq 'lmxll' or $type eq 'nnxnp';
+    if(&judge($bases,$mutant,$threshold) && &judge($bases,$main,$threshold)){
+        return $type eq 'lmxll' ? 'lm' : 'np';
+    }elsif(!&judge($bases,$mutant,1) && &judge($bases,$main,3)){
+        return $type eq 'lmxll' ? 'll' : 'nn';
+    }else{
+        return "..";
+    }
+}
+
+sub variation_type {
+    my($main, $mutant) = @_;
+    return ($main =~ /[+\-]/ or $mutant =~ /[+\-]/) ? "Indel" : "SNP";
+}
+
+sub is_single_dose{
+    my($main, $mutant);
+    die "Number of mutant allele is 0!" unless $mutant;
+    return ($main/$mutant <= 30 and $main/$mutant >= 6) ? 1 : 0;
 }
 
 sub process_pileup{
-    my($infile, $threshold) = @_;
+    my $para = shift;
+    my($infile, $threshold) = ($para->{infile}, $para->{threshold});
     open my $in_fh, "<", $infile or die;
     
     while(my $line = <$in_fh>){
@@ -84,14 +109,11 @@ sub process_pileup{
         
         map{$_ =~ s/,/./g; $_ =~ tr/atgc/ATGC/}($female,@progeny);
         my %hash=&parse_reads(@progeny);
-        unless((keys %hash) > 1){next;}
+        next unless keys %hash > 1;
         my ($main,$mutant,@other_nt) = sort {$hash{$b} <=> $hash{$a}} (keys %hash);
-        #<--single dose
-        unless($hash{$main}/$hash{$mutant} <= 30 && $hash{$main}/$hash{$mutant} >= 6){next;}
-        #single dose -->
-        my $type;
-        if($main =~ /[+\-]/ || $mutant =~ /[+\-]/){$type = "Indel";}
-        else{$type = "SNP";}
+        next unless is_single_dose($hash{$main}, $hash{$mutant});
+        my $type = variation_type($main, $mutant);
+        
         # SNP
         print "$id\t<$type>\t<position>";
         map{@_ = &parse_reads($_);print "\t",@_}($female,@progeny);
@@ -101,22 +123,20 @@ sub process_pileup{
         if(&judge($female,$main,$threshold) && &judge($female,$mutant,$threshold)){
             print "<lmxll>\tlm";
             foreach(@progeny){
-                if(&judge($_,$mutant,$threshold) && &judge($_,$main,$threshold)){print "\tlm";}
-                elsif(!&judge($_,$mutant,1) && &judge($_,$main,3)){print "\tll";}
-                else{print "\t..";}
+                my $genotype = decide_genotype('lmxll', $_, $main, $mutant, $para);
+                print "\t$genotype";
             }
-        }
-        # nnxnp
-        elsif(&judge($female,$main,$threshold) && !&judge($female,$mutant,1)){
+        }elsif(&judge($female,$main,$threshold) && !&judge($female,$mutant,1)){
+            # nnxnp
             print "<nnxnp>\tnn";
             foreach(@progeny){
-                if(&judge($_,$mutant,$threshold)  && &judge($_,$main,$threshold)){print "\tnp";}
-                elsif(!&judge($_,$mutant,1) && &judge($_,$main,3)){print "\tnn";}
-                else{print "\t..";}
+                my $genotype = decide_genotype('nnxnp', $_, $main, $mutant, $para);
+                print "\t$genotype";
             }
+        }else{
+            #other
+            print "<Unknown>";
         }
-        #other
-        else{print "<Unknown>";}
         print "\n";
     }
     close $in_fh;
@@ -128,7 +148,7 @@ sub process_pileup{
 
 sub main{
     my $para = read_commands;
-    process_pileup($para->{infile}, $para->{threshold});
+    process_pileup($para);
 }
 
 main();
