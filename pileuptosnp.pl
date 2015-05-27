@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use Getopt::Long;
 
+############################################################
+# Usage
+############################################################
+
 sub usage{
     print <<USAGE;
 
@@ -18,18 +22,55 @@ USAGE
     exit;
 }
 
-sub main{
-    my $help;
-    my $threshold = 3;
+############################################################
+# Read commands
+############################################################
 
-    GetOptions ("help" => \$help,
-                "threshold" => \$threshold
+sub read_commands{
+    my %para = (threshold => 3);
+
+    GetOptions ("help" => \$para{help},
+                "threshold" => \$para{threshold}
                );
 
-    usage if $help or @ARGV == 0;
-    my $infile = shift @ARGV;
+    usage if $para{help} or @ARGV == 0;
+    $para{infile} = shift @ARGV;
+    return \%para;
+}
 
-    process_pileup($infile, $threshold);
+############################################################
+# Process pileup
+############################################################
+
+sub parse_reads{
+    my @reads = @_;
+    my %nt=();
+    my $read;
+    while(@reads){
+        $read = shift @reads;
+        while($read =~ /([.ATGCatgc][+\-](\d+))|([.ATGCatgc](?![+\-]))/g){
+            my $match = $&;
+            my $n = $2;
+            if($match =~ /[+\-]/){
+                $read =~ /[A-Za-z]{$n}/g;
+                $match .= $&;
+                $nt{$match}++;
+            }else{$nt{$match}++;}
+        }
+    }
+    if(%nt){%nt;}
+    else{("*","");}
+}
+
+sub judge{
+    my ($read,$nt,$cut_off)=@_;
+    my %count = &parse_reads($read);
+    my $nt_count=0;
+    if(exists $count{$nt}){
+        $nt_count = $count{$nt};
+    }
+    if($nt_count >= $cut_off){1;}
+    else{0;}
 }
 
 sub process_pileup{
@@ -38,6 +79,9 @@ sub process_pileup{
     
     while(my $line = <$in_fh>){
         my ($id,$female,@progeny)=split(/ /,$line);
+        die "Data format incorrect: $line" 
+            unless $id and $female and @progeny;
+        
         map{$_ =~ s/,/./g; $_ =~ tr/atgc/ATGC/}($female,@progeny);
         my %hash=&parse_reads(@progeny);
         unless((keys %hash) > 1){next;}
@@ -78,34 +122,13 @@ sub process_pileup{
     close $in_fh;
 }
 
-sub judge{
-    my ($read,$nt,$cut_off)=@_;
-    my %count = &parse_reads($read);
-    my $nt_count=0;
-    if(exists $count{$nt}){
-        $nt_count = $count{$nt};
-    }
-    if($nt_count >= $cut_off){1;}
-    else{0;}
-}
-sub parse_reads{
-    my @reads = @_;
-    my %nt=();
-    my $read;
-    while(@reads){
-        $read = shift @reads;
-        while($read =~ /([.ATGCatgc][+\-](\d+))|([.ATGCatgc](?![+\-]))/g){
-            my $match = $&;
-            my $n = $2;
-            if($match =~ /[+\-]/){
-                $read =~ /[A-Za-z]{$n}/g;
-                $match .= $&;
-                $nt{$match}++;
-            }else{$nt{$match}++;}
-        }
-    }
-    if(%nt){%nt;}
-    else{("*","");}
+############################################################
+# Main
+############################################################
+
+sub main{
+    my $para = read_commands;
+    process_pileup($para->{infile}, $para->{threshold});
 }
 
 main();
