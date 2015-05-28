@@ -13,8 +13,13 @@ sub usage{
 
 perl pileuptosnp.pl <genome.pileup.matrix.txt> [OPTIONS]
 
+  -i,--min NUM
+  -x,--max NUM
+    the range for main / mutant 
+    Default: min is 6, max is 30
+
   -t,--threshold NUM
-    threshold
+    threshold, default: 3
 
   -h,--help
 
@@ -27,11 +32,21 @@ USAGE
 ############################################################
 
 sub read_commands{
-    my %para = (threshold => 3);
+    my %para = (
+        min => 6,
+        max => 30,
+        lines => 0,
+        not_single_dose => 0,
+        is_single_dose => 0,
+        threshold => 3
+    );
 
-    GetOptions ("help" => \$para{help},
-                "threshold" => \$para{threshold}
-               );
+    GetOptions (
+        "i|min=i" => \$para{min},
+        "x|max=i" => \$para{max},
+        "threshold=i" => \$para{threshold},
+        "help" => \$para{help}
+    );
 
     usage if $para{help} or @ARGV == 0;
     $para{infile} = shift @ARGV;
@@ -92,9 +107,17 @@ sub variation_type {
 }
 
 sub is_single_dose{
-    my($main, $mutant);
+    my($main, $mutant, $para) = @_;
     die "Number of mutant allele is 0!" unless $mutant;
-    return ($main/$mutant <= 30 and $main/$mutant >= 6) ? 1 : 0;
+    return ($main/$mutant <= $para->{max} and $main/$mutant >= $para->{min}) ? 1 : 0;
+}
+
+sub print_hash{
+    my %hash = @_;
+    for my $key (keys %hash){
+        my $value = $hash{$key};
+        print "Key: $key; Value: $value\n";
+    }
 }
 
 sub process_pileup{
@@ -103,15 +126,25 @@ sub process_pileup{
     open my $in_fh, "<", $infile or die;
     
     while(my $line = <$in_fh>){
-        my ($id,$female,@progeny)=split(/ /,$line);
-        die "Data format incorrect: $line" 
-            unless $id and $female and @progeny;
+        $para->{lines}++;
+        #print $line;
+        #next if $line =~ /^\[/;
+        my ($id,$female,@progeny)=split(/\s+/,$line);
+        #die "Data format incorrect: $line" 
+        #    unless $id and $female and @progeny;
         
         map{$_ =~ s/,/./g; $_ =~ tr/atgc/ATGC/}($female,@progeny);
         my %hash=&parse_reads(@progeny);
         next unless keys %hash > 1;
         my ($main,$mutant,@other_nt) = sort {$hash{$b} <=> $hash{$a}} (keys %hash);
-        next unless is_single_dose($hash{$main}, $hash{$mutant});
+        #print_hash(%hash);
+        #print "Main: $main $hash{$main}; Mutant: $mutant $hash{$mutant}\n";
+        unless(is_single_dose($hash{$main}, $hash{$mutant}, $para)){
+            $para->{not_single_dose}++;
+            next;
+        }else{
+            $para->{is_single_dose}++;
+        }
         my $type = variation_type($main, $mutant);
         
         # SNP
@@ -139,8 +172,9 @@ sub process_pileup{
         }
         print "\n";
     }
-    close $in_fh;
+    close $in_fh;	
 }
+
 
 ############################################################
 # Main
@@ -149,6 +183,14 @@ sub process_pileup{
 sub main{
     my $para = read_commands;
     process_pileup($para);
+    
+    ###
+    printf "Number of lines in file: %d\n", 
+        $para->{lines};
+    printf "Number of positions exist mutants: %d\n", 
+        $para->{not_single_dose} + $para->{is_single_dose};
+    printf "Number of positions is single dose: %d\n", 
+        $para->{is_single_dose};   
 }
 
 main();
