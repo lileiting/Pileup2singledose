@@ -94,11 +94,23 @@ sub decide_genotype{
     die unless $type eq 'lmxll' or $type eq 'nnxnp';
     if(&judge($bases,$mutant,$threshold) && &judge($bases,$main,$threshold)){
         return $type eq 'lmxll' ? 'lm' : 'np';
-    }elsif(!&judge($bases,$mutant,1) && &judge($bases,$main,3)){
+    }elsif(!&judge($bases,$mutant,1) && &judge($bases,$main,$threshold)){
         return $type eq 'lmxll' ? 'll' : 'nn';
     }else{
         return "..";
     }
+}
+
+sub decide_h_a_b{
+    my ($bases, $main, $mutant, $para) = @_;
+    my $threshold = $para->{threshold};
+    if(&judge($bases,$mutant,$threshold) and &judge($bases,$main,$threshold)){
+        return 'h';
+    }elsif(!&judge($bases,$mutant,1) and &judge($bases,$main,$threshold)){
+        return 'a';
+    }elsif(&judge($bases,$mutant,$threshold) and !&judge($bases,$main,1)){
+        return 'b';
+    }else{die}
 }
 
 sub variation_type {
@@ -119,6 +131,8 @@ sub print_hash{
         print "Key: $key; Value: $value\n";
     }
 }
+
+
 
 sub process_pileup{
     my $para = shift;
@@ -148,27 +162,31 @@ sub process_pileup{
         my $type = variation_type($main, $mutant);
         
         # SNP
-        print "$id\t<$type>\t<position>";
+        print "$id\t<$type>\t<bases>";
         map{@_ = &parse_reads($_);print "\t",@_}($female,@progeny);
         print "\n";
-        print "$id\t<$type>\t";
+        print "$id\t<$type>\t<genotype>";
         # lmxll
-        if(&judge($female,$main,$threshold) && &judge($female,$mutant,$threshold)){
-            print "<lmxll>\tlm";
-            foreach(@progeny){
-                my $genotype = decide_genotype('lmxll', $_, $main, $mutant, $para);
-                print "\t$genotype";
-            }
-        }elsif(&judge($female,$main,$threshold) && !&judge($female,$mutant,1)){
-            # nnxnp
-            print "<nnxnp>\tnn";
-            foreach(@progeny){
-                my $genotype = decide_genotype('nnxnp', $_, $main, $mutant, $para);
-                print "\t$genotype";
-            }
-        }else{
-            #other
-            print "<Unknown>";
+        #if(&judge($female,$main,$threshold) && &judge($female,$mutant,$threshold)){
+        #    print "<lmxll>\tlm";
+        #    foreach(@progeny){
+        #        my $genotype = decide_genotype('lmxll', $_, $main, $mutant, $para);
+        #        print "\t$genotype";
+        #    }
+        #}elsif(&judge($female,$main,$threshold) && !&judge($female,$mutant,1)){
+        #    # nnxnp
+        #    print "<nnxnp>\tnn";
+        #    foreach(@progeny){
+        #        my $genotype = decide_genotype('nnxnp', $_, $main, $mutant, $para);
+        #        print "\t$genotype";
+        #    }
+        #}else{
+        #    #other
+        #    print "<Unknown>";
+        #}
+        for my $progeny_bases ($female, @progeny){
+            my $genotype = decide_h_a_b($progeny_bases, $main, $mutant, $para);
+            print "\t$genotype";
         }
         print "\n";
     }
