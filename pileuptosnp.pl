@@ -50,6 +50,7 @@ sub read_commands{
 
     usage if $para{help} or @ARGV == 0;
     $para{infile} = shift @ARGV;
+    die "Input file not exist" unless -e $para{infile};
     return \%para;
 }
 
@@ -137,7 +138,7 @@ sub print_hash{
 sub process_pileup{
     my $para = shift;
     my($infile, $threshold) = ($para->{infile}, $para->{threshold});
-    open my $in_fh, "<", $infile or die;
+    open my $in_fh, "<", $infile or die "$infile: $!";
     
     while(my $line = <$in_fh>){
         $para->{lines}++;
