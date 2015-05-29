@@ -1,5 +1,5 @@
-# PileupToSNP
-A procedure to call SNP
+# Pileup2singledose
+A procedure to call single dose SNP
 
 Installation
 ------
