@@ -141,6 +141,7 @@ sub process_pileup{
     open my $in_fh, "<", $infile or die "$infile: $!";
     
     while(my $line = <$in_fh>){
+        next if $line =~ /^\s*#/ or $line =~ /^\s*$/;
         $para->{lines}++;
         #print $line;
         #next if $line =~ /^\[/;
