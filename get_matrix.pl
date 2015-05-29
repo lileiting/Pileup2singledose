@@ -66,7 +66,7 @@ sub main{
     my %super_hash;
     
     my @files;
-    for my $file ($male, $female, @$prog_ref){
+    for my $file ($female, $male, @$prog_ref){
         next unless $file and -e $file;
         push @files, $file;
         warn "Loading pileup data from $file ...\n";
