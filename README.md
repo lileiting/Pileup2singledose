@@ -4,7 +4,7 @@ A procedure to call single dose SNP from [pileup format](http://samtools.sourcef
 Installation
 ------
 
-    git clone https://github.com/lileiting/PileupToSNP.git
+    git clone https://github.com/lileiting/Pileup2singledose.git
 
 How to use it
 ------
