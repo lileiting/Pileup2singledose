@@ -1,5 +1,5 @@
 # Pileup2singledose
-A procedure to call single dose SNP
+A procedure to call single dose SNP from [pileup format](http://samtools.sourceforge.net/pileup.shtml)
 
 Installation
 ------
