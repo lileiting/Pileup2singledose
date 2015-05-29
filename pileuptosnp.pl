@@ -64,12 +64,12 @@ sub parse_reads{
     my $read;
     while(@reads){
         $read = shift @reads;
-        while($read =~ /([.ATGCatgc][+\-](\d+))|([.ATGCatgc](?![+\-]))/g){
-            my $match = $&;
-            my $n = $2;
+        while($read =~ /(([.ATGCatgc][+\-](\d+))|([.ATGCatgc](?![+\-])))/g){
+            my $match = $1;
+            my $n = $3;
             if($match =~ /[+\-]/){
-                $read =~ /[A-Za-z]{$n}/g;
-                $match .= $&;
+                $read =~ /([A-Za-z]{$n})/g;
+                $match .= $1;
                 $nt{$match}++;
             }else{
                 $nt{$match}++;
