@@ -7,7 +7,7 @@ use Getopt::Long;
 sub usage{
     print <<USAGE;
 
-perl get_matrix.pl [OPTIONS]
+perl createpileupmatrix.pl [OPTIONS]
 
     -m,--male <male.pileup>
     -f,--female <female.pileup>

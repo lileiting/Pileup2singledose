@@ -11,7 +11,7 @@ use Getopt::Long;
 sub usage{
     print <<USAGE;
 
-perl pileuptosnp.pl <genome.pileup.matrix.txt> [OPTIONS]
+perl pileup2singledose.pl <genome.pileup.matrix.txt> [OPTIONS]
 
   -i,--min NUM
   -x,--max NUM
