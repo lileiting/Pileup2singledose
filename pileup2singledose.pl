@@ -111,7 +111,7 @@ sub decide_h_a_b{
         return 'a';
     }elsif(&judge($bases,$mutant,$threshold) and !&judge($bases,$main,1)){
         return 'b';
-    }else{die}
+    }else{return ".."}
 }
 
 sub variation_type {
