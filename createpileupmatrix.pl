@@ -78,7 +78,7 @@ sub main{
             next unless /^(\S+)\s+(\d+)\s+([ATGCatgcNn])\s+(\d+)\s+(\S+)\s+(\S+)/;
             $num_valid++;
             my($chr, $pos, $nt, $num, $bases, $qual) = ($1, $2, $3, $4, $5, $6);
-            $super_hash{"$chr-$pos"}->{$file} = $bases;
+            $super_hash{"$chr-$pos-$nt"}->{$file} = $bases;
         }
         close $fh;
         warn "$num_line lines, $num_valid valid lines\n";
