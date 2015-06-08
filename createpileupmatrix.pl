@@ -4,6 +4,8 @@ use warnings;
 use strict;
 use Getopt::Long;
 
+# URL: https://github.com/lileiting/Pileup2singledose
+
 sub usage{
     print <<USAGE;
 

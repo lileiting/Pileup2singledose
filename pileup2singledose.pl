@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
+# URL: https://github.com/lileiting/Pileup2singledose
+
 ############################################################
 # Usage
 ############################################################
