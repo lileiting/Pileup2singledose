@@ -15,4 +15,9 @@ First step, create a pileup matrix
 
 Second step, call single dose
 
-    perl pileup2singledose.pl pileup.matrix.txt
+    perl pileup2singledose.pl pileup.matrix.txt > genotypes.matrix.txt
+
+Third step, filter results
+
+    perl filtergenotypes.pl -i genotypes.matrix.txt -t 0.2 -o genotypes.matrix.t0.2.txt
+
