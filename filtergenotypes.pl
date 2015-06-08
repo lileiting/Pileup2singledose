@@ -15,7 +15,7 @@ perl filtergenotypes.pl [OPTIONS]
     Results from pileup2singledose.pl
 
   -t,--threshold DECIMAL 
-    Rate missing data allowed
+    Allowed rate of missing data
     Default: 0.5
 
   -o,--out OUTPUT.txt
