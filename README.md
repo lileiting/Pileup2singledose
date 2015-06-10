@@ -1,6 +1,11 @@
 # Pileup2singledose
 A procedure to call single dose SNP from [pileup format](http://samtools.sourceforge.net/pileup.shtml)
 
+* Author: [Lei-Ting Li](https://github.com/lileiting)
+* Email: lileiting@gmail.com
+* LICENCE: [BSD](http://opensource.org/licenses/bsd-license.php)
+
+
 Installation
 ------
 
