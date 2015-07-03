@@ -26,3 +26,6 @@ Third step, filter results
 
     perl filtergenotypes.pl -i genotypes.matrix.txt -t 0.2 -o genotypes.matrix.t0.2.txt
 
+Fourth step, convert format for [BinMarkers](https://github.com/lileiting/BinMarkers)
+
+    perl format4binmarkers.pl genotypes.matrix.t0.2.txt > genotypes.matrix.t0.2.txt.matrix
