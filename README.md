@@ -16,7 +16,7 @@ How to use it
 
 First step, create a pileup matrix
 
-    perl createpileupmatrix.pl -m male.pileup -f female.pileup -p progeny1.pileup,progeny2.pileup,progeny3.pileup -o pileup.matrix.txt
+    perl create_pileup_matrix.pl -m male.pileup -f female.pileup -p progeny1.pileup,progeny2.pileup,progeny3.pileup -o pileup.matrix.txt
 
 Second step, call single dose
 
@@ -24,7 +24,7 @@ Second step, call single dose
 
 Third step, filter results
 
-    perl filtergenotypes.pl -i genotypes.matrix.txt -t 0.2 -o genotypes.matrix.t0.2.txt
+    perl filter_genotypes.pl -i genotypes.matrix.txt -t 0.2 -o genotypes.matrix.t0.2.txt
 
 Fourth step, convert format for [BinMarkers](https://github.com/lileiting/BinMarkers)
 
