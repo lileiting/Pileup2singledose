@@ -22,8 +22,8 @@ USAGE
 
 sub convert{
     my %hash = ( 
-       h => {h => 'lm', a => 'll', '-' => '-'},
-       a => {h => 'np', a => 'nn', '-' => '-'}
+       h => {h => 'lm', a => 'll'},
+       a => {h => 'np', a => 'nn'}
     );
 
     my @new;
