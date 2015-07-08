@@ -96,11 +96,12 @@ sub decide_segregation_type{
     my $threshold = $para->{threshold};
     my $bases = $female;
     if(&judge($female,$mutant,$threshold) && &judge($female,$main,$threshold)
-        and not &judge($male,$mutant,1) && &judge($male,$main,$threshold)
+#        and not &judge($male,$mutant,1) && &judge($male,$main,$threshold)
     ){
         return 'lmxll';
     }elsif(&judge($male,$mutant,$threshold) && &judge($male,$main,$threshold)
-        and not &judge($female,$mutant,1) && &judge($female,$main,$threshold)){
+#        and not &judge($female,$mutant,1) && &judge($female,$main,$threshold)
+    ){
         return 'nnxnp';
     }else{
         return "unexpected";
@@ -189,24 +190,6 @@ sub process_pileup{
         map{@_ = &parse_reads($_);print "\t",@_}($female,@progeny);
         print "\n";
         print "$id\t<$type>\t<genotype>";
-        # lmxll
-        #if(&judge($female,$main,$threshold) && &judge($female,$mutant,$threshold)){
-        #    print "<lmxll>\tlm";
-        #    foreach(@progeny){
-        #        my $genotype = decide_genotype('lmxll', $_, $main, $mutant, $para);
-        #        print "\t$genotype";
-        #    }
-        #}elsif(&judge($female,$main,$threshold) && !&judge($female,$mutant,1)){
-        #    # nnxnp
-        #    print "<nnxnp>\tnn";
-        #    foreach(@progeny){
-        #        my $genotype = decide_genotype('nnxnp', $_, $main, $mutant, $para);
-        #        print "\t$genotype";
-        #    }
-        #}else{
-        #    #other
-        #    print "<Unknown>";
-        #}
 
         for my $progeny_bases ($female, $male, @progeny){
             my $genotype = decide_genotype($seg_type, $progeny_bases, $main, $mutant, $para);
