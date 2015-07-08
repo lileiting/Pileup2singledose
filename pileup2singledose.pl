@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Getopt::Long;
+use FindBin;
 
 # URL: https://github.com/lileiting/Pileup2singledose
 
@@ -13,17 +14,17 @@ use Getopt::Long;
 sub usage{
     print <<USAGE;
 
-perl pileup2singledose.pl <genome.pileup.matrix.txt> [OPTIONS]
+  $FindBin::Script <genome.pileup.matrix.txt> [OPTIONS]
 
-  -i,--min NUM
-  -x,--max NUM
-    the range for main / mutant 
-    Default: min is 6, max is 30
+    -i,--min NUM
+    -x,--max NUM
+      the range for main / mutant 
+      Default: min is 6, max is 30
 
-  -t,--threshold NUM
-    threshold, default: 3
+    -t,--threshold NUM
+      threshold, default: 3
 
-  -h,--help
+    -h,--help
 
 USAGE
     exit;
