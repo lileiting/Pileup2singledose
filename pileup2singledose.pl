@@ -91,16 +91,32 @@ sub judge{
     return $nt_count >= $cut_off ? 1 : 0;
 }
 
+sub decide_segregation_type{
+    my ($female, $male, $main, $mutant, $para) = @_;
+    my $threshold = $para->{threshold};
+    my $bases = $female;
+    if(&judge($female,$mutant,$threshold) && &judge($female,$main,$threshold)
+        and not &judge($male,$mutant,1) && &judge($male,$main,$threshold)
+    ){
+        return 'lmxll';
+    }elsif(&judge($male,$mutant,$threshold) && &judge($male,$main,$threshold)
+        and not &judge($female,$mutant,1) && &judge($female,$main,$threshold)){
+        return 'nnxnp';
+    }else{
+        return "unexpected";
+    }
+}
+
 sub decide_genotype{
     my ($type, $bases, $main, $mutant, $para) = @_;
     my $threshold = $para->{threshold};
-    die unless $type eq 'lmxll' or $type eq 'nnxnp';
+    return 'Undef' unless $type eq 'lmxll' or $type eq 'nnxnp';
     if(&judge($bases,$mutant,$threshold) && &judge($bases,$main,$threshold)){
         return $type eq 'lmxll' ? 'lm' : 'np';
     }elsif(!&judge($bases,$mutant,1) && &judge($bases,$main,$threshold)){
         return $type eq 'lmxll' ? 'll' : 'nn';
     }else{
-        return "..";
+        return "-";
     }
 }
 
@@ -135,7 +151,8 @@ sub print_hash{
     }
 }
 
-
+# Assume the first column is maternal parent, second column
+# is paternal parent.
 
 sub process_pileup{
     my $para = shift;
@@ -145,14 +162,12 @@ sub process_pileup{
     while(my $line = <$in_fh>){
         next if $line =~ /^\s*#/ or $line =~ /^\s*$/;
         $para->{lines}++;
-        #print $line;
-        #next if $line =~ /^\[/;
-        my ($id,$female,@progeny)=split(/\s+/,$line);
-        #die "Data format incorrect: $line" 
-        #    unless $id and $female and @progeny;
+        my ($id,$female,$male, @progeny)=split(/\s+/,$line);
+        die "Data format incorrect: $line" 
+            unless $id and $female and @progeny;
         
-        map{$_ =~ s/,/./g; $_ =~ tr/atgc/ATGC/}($female,@progeny);
-        my %hash=&parse_reads(@progeny);
+        map{$_ =~ s/,/./g; $_ =~ tr/atgc/ATGC/}($female,$male,@progeny);
+        my %hash=&parse_reads($female, $male, @progeny);
         next unless keys %hash > 1;
         my ($main,$mutant,@other_nt) = sort {$hash{$b} <=> $hash{$a}} (keys %hash);
         #print_hash(%hash);
@@ -164,7 +179,11 @@ sub process_pileup{
             $para->{is_single_dose}++;
         }
         my $type = variation_type($main, $mutant);
-        
+       
+        my $seg_type = decide_segregation_type($female, $male, $main, $mutant, $para);
+        #next if $seg_type eq "unexpected";
+
+ 
         # SNP
         print "$id\t<$type>\t<bases>";
         map{@_ = &parse_reads($_);print "\t",@_}($female,@progeny);
@@ -188,8 +207,9 @@ sub process_pileup{
         #    #other
         #    print "<Unknown>";
         #}
-        for my $progeny_bases ($female, @progeny){
-            my $genotype = decide_h_a_b($progeny_bases, $main, $mutant, $para);
+
+        for my $progeny_bases ($female, $male, @progeny){
+            my $genotype = decide_genotype($seg_type, $progeny_bases, $main, $mutant, $para);
             print "\t$genotype";
         }
         print "\n";
@@ -215,4 +235,4 @@ sub main{
         $para->{is_single_dose};   
 }
 
-main();
+main() unless caller;
