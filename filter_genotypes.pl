@@ -60,13 +60,15 @@ sub read_commands{
 
 sub missing_rate{
     my @genotypes = @_[3..$#_];
-    my %count = (lm=>0, ll=>0, nn=>0, np => 0, q/-/ => 0);
+    my %count = (lm => 0, ll => 0, 
+                 nn => 0, np => 0, 
+               q/-/ => 0          );
     map{$count{$_}++}@genotypes;
     my $total_genotypes = $count{lm} + $count{ll} + 
                           $count{nn} + $count{np} + 
-                          $count{q/../};
+                          $count{q/-/};
     die "Total genotypes equal to zero ?" if $total_genotypes == 0;
-    return $count{q/../}/$total_genotypes;
+    return $count{q/-/}/$total_genotypes;
 }
 
 sub message{local $\ = "\n"; print STDERR @_}
@@ -86,6 +88,7 @@ sub main{
         chomp;
         my @F = split /\s+/;
         next unless $F[2] eq q/<genotype>/;
+        next if $F[3] eq $F[4];
         $num_of_markers++;
         next if missing_rate(@F) > $threshold;
         $num_of_filtered_markers++;
