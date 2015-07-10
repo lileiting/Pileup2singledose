@@ -82,6 +82,7 @@ sub main{
     while(<$in_fh>){
         $num_of_lines++;
         next if /^\s*#/ or /^\s*$/;
+        next if /Undef/;
         chomp;
         my @F = split /\s+/;
         next unless $F[2] eq q/<genotype>/;
