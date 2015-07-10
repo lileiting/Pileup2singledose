@@ -60,10 +60,12 @@ sub read_commands{
 
 sub missing_rate{
     my @genotypes = @_[3..$#_];
-    my %count = (h=>0, a=>0, b=>0, q/../ => 0);
+    my %count = (lm=>0, ll=>0, nn=>0, np => 0, q/-/ => 0);
     map{$count{$_}++}@genotypes;
-    my $total_genotypes = $count{h}+$count{a}+$count{b}+$count{q/../};
-    die "Total genotypes equal to 0???" if $total_genotypes == 0;
+    my $total_genotypes = $count{lm} + $count{ll} + 
+                          $count{nn} + $count{np} + 
+                          $count{q/../};
+    die "Total genotypes equal to zero ?" if $total_genotypes == 0;
     return $count{q/../}/$total_genotypes;
 }
 
@@ -95,5 +97,5 @@ sub main{
     exit;
 }
 
-main;
+main() unless caller;
 
