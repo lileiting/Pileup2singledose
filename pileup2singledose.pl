@@ -171,7 +171,8 @@ sub print_hash_str{
         return 'empty';
     }elsif(keys %hash == 1){
         my ($key, $value) = each %hash;
-        return "$key|$value"
+        if($key eq '*'){return '*'}
+        else{return "$key|$value"}
     }else{
         my @array;
         for my $key (keys %hash){
@@ -228,12 +229,12 @@ sub process_pileup{
         }
         my $type = variation_type($main, $mutant);
        
-        my $seg_type = decide_segregation_type($female, $male, $main, $mutant, $para);
-        print "# $.: Seg type: $seg_type\n" if $verbose;
-        if ($seg_type eq "unexpected"){
-            $para->{seg_type_unexpected}++;
-            next;
-        }
+#        my $seg_type = decide_segregation_type($female, $male, $main, $mutant, $para);
+#        print "# $.: Seg type: $seg_type\n" if $verbose;
+#        if ($seg_type eq "unexpected"){
+#            $para->{seg_type_unexpected}++;
+#            next;
+#        }
 
         # SNP
         my $base_info = "$id\t<$type>\t<bases>";
@@ -242,7 +243,7 @@ sub process_pileup{
         my $gt_info = "$id\t<$type>\t<genotype>";
 
         for my $progeny_bases ($female, $male, @progeny){
-            my $genotype = decide_genotype($seg_type, $progeny_bases, $main, $mutant, $para);
+            my $genotype = decide_h_a_b($progeny_bases, $main, $mutant, $para);
             $gt_info .= "\t$genotype";
         }
         print "$base_info\n$gt_info\n";
@@ -263,8 +264,8 @@ sub print_stat{
         $para->{not_single_dose} + $para->{is_single_dose};
     printf "Number of positions is single dose: %d\n",
         $para->{is_single_dose};
-    print "Segeration type could not be decided: ",
-        $para->{seg_type_unexpected},"\n";
+    #print "Segeration type could not be decided: ",
+    #    $para->{seg_type_unexpected},"\n";
 }
 
 sub main{

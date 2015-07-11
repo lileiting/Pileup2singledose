@@ -26,6 +26,10 @@ Third step, filter results
 
     perl filter_genotypes.pl -i genotypes.matrix.txt -t 0.2 -o genotypes.matrix.t0.2.txt
 
-Fourth step, convert format for [BinMarkers](https://github.com/lileiting/BinMarkers)
+Fourth step, convert genotypes codes from h, a, b to lm, ll, nn, np
 
-    perl format4binmarkers.pl genotypes.matrix.t0.2.txt > genotypes.matrix.t0.2.txt.matrix
+    perl convert_genotypes.pl genotypes.matrix.t0.2.txt > genotypes.matrix.t0.2.cp.txt
+
+Fifth step, convert format for [BinMarkers](https://github.com/lileiting/BinMarkers)
+
+    perl format4binmarkers.pl genotypes.matrix.t0.2.cp.txt > genotypes.matrix.t0.2.cp.txt.matrix
