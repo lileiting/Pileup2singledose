@@ -32,5 +32,6 @@ Fifth step, convert format for [BinMarkers](https://github.com/lileiting/BinMark
 
     perl format4binmarkers.pl genotypes.matrix.t0.2.cp.txt > genotypes.matrix.t0.2.cp.txt.matrix
 
-## Citation
-Zhang J., Sharma A., Yu Q., Wang J., Li L., Zhu L., Zhang X., Chen Y., Ming R. Comparative structural analysis of Bru1 region homeologs in Saccharum spontaneum and S. officinarum. BMC Genomics 2016, 17:446. doi:[10.1186/s12864-016-2817-9](http://dx.doi.org/10.1186/s12864-016-2817-9); pmid:[27287040](http://www.ncbi.nlm.nih.gov/pubmed/27287040)
+## Research works that cited this repository
+- Jisen Zhang, Anupma Sharma, Qingyi Yu, Jianping Wang, Leiting Li, Lin Zhu, Xingtan Zhang, Youqiang Chen, Ray Ming. Comparative structural analysis of Bru1 region homeologs in Saccharum spontaneum and S. officinarum. BMC Genomics, 2016, 17:446. doi:[10.1186/s12864-016-2817-9](http://dx.doi.org/10.1186/s12864-016-2817-9); pmid:[27287040](http://www.ncbi.nlm.nih.gov/pubmed/27287040)
+- Jisen Zhang, Qing Zhang, Leiting Li, Haibao Tang, Qiong Zhang, Yang Chen, Jie Arro, Xingtan Zhang, Aiqin Wang, Chenyong Miao, Ray Ming. Recent Polyploidization Events in Three Saccharum Founding Species. Plant Biotechnology Journal, 2018. doi:[10.1186/s12864-016-2817-9](https://doi.org/10.1111/pbi.12962)
